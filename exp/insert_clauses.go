@@ -13,6 +13,14 @@ type (
 		ColsAppend(cols ColumnListExpression) InsertClauses
 		SetCols(cols ColumnListExpression) InsertClauses
 
+		Using() Expression
+		SetUsing(u Expression) InsertClauses
+		HasUsing() bool
+
+		Tags() ColumnListExpression
+		SetTags(ts ColumnListExpression) InsertClauses
+		HasTags() bool
+
 		Into() Expression
 		SetInto(cl Expression) InsertClauses
 
@@ -44,6 +52,8 @@ type (
 		commonTables []CommonTableExpression
 		cols         ColumnListExpression
 		into         Expression
+		using        Expression
+		tags         ColumnListExpression
 		returning    ColumnListExpression
 		alias        IdentifierExpression
 		rows         []interface{}
@@ -52,6 +62,14 @@ type (
 		conflict     ConflictExpression
 	}
 )
+
+func (ic *insertClauses) HasUsing() bool {
+	return ic.using != nil
+}
+
+func (ic *insertClauses) HasTags() bool {
+	return ic.tags != nil
+}
 
 func NewInsertClauses() InsertClauses {
 	return &insertClauses{}
@@ -66,6 +84,8 @@ func (ic *insertClauses) clone() *insertClauses {
 		commonTables: ic.commonTables,
 		cols:         ic.cols,
 		into:         ic.into,
+		using:        ic.using,
+		tags:         ic.tags,
 		returning:    ic.returning,
 		alias:        ic.alias,
 		rows:         ic.rows,
@@ -107,6 +127,26 @@ func (ic *insertClauses) SetCols(cl ColumnListExpression) InsertClauses {
 
 func (ic *insertClauses) Into() Expression {
 	return ic.into
+}
+
+func (ic *insertClauses) Using() Expression {
+	return ic.using
+}
+
+func (ic *insertClauses) SetUsing(using Expression) InsertClauses {
+	ret := ic.clone()
+	ret.using = using
+	return ret
+}
+
+func (ic *insertClauses) Tags() ColumnListExpression {
+	return ic.tags
+}
+
+func (ic *insertClauses) SetTags(tags ColumnListExpression) InsertClauses {
+	ret := ic.clone()
+	ret.tags = tags
+	return ret
 }
 
 func (ic *insertClauses) SetInto(into Expression) InsertClauses {

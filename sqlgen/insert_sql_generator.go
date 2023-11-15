@@ -60,6 +60,17 @@ func (isg *insertSQLGenerator) Generate(
 		case IntoSQLFragment:
 			b.WriteRunes(isg.DialectOptions().SpaceRune)
 			isg.ExpressionSQLGenerator().Generate(b, clauses.Into())
+		case UsingSQLFragment:
+			if clauses.HasUsing() {
+				b.Write(isg.DialectOptions().UsingFragment)
+				isg.ExpressionSQLGenerator().Generate(b, clauses.Using())
+			}
+
+		case TagsSQLFragment:
+			if clauses.HasTags() {
+				b.Write(isg.DialectOptions().TagsFragment)
+				isg.insertColumnsSQL(b, clauses.Tags())
+			}
 		case InsertSQLFragment:
 			isg.InsertSQL(b, clauses)
 		case ReturningSQLFragment:

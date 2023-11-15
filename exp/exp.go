@@ -263,6 +263,13 @@ type (
 		// Returns a new ColumnListExpression with the columns appended.
 		Append(...Expression) ColumnListExpression
 	}
+	TagListExpression interface {
+		Expression
+		//// Returns the list of columns
+		//Columns() []Expression
+		//// Returns true if the column list is empty
+	}
+
 	CompoundType       int
 	CompoundExpression interface {
 		Expression

@@ -89,6 +89,8 @@ type (
 		FromFragment []byte
 		// The SQL USING join clause fragment (DEFAULT=[]byte(" USING "))
 		UsingFragment []byte
+		// default = tags
+		TagsFragment []byte
 		// The SQL ON join clause fragment (DEFAULT=[]byte(" ON "))
 		OnFragment []byte
 		// The SQL WHERE clause fragment (DEFAULT=[]byte(" WHERE "))
@@ -353,6 +355,9 @@ const (
 	DeleteBeginSQLFragment
 	TruncateSQLFragment
 	WindowSQLFragment
+
+	UsingSQLFragment
+	TagsSQLFragment
 )
 
 // nolint:gocyclo // simple type to string conversion
@@ -446,6 +451,7 @@ func DefaultDialectOptions() *SQLDialectOptions {
 		ReturningFragment:         []byte(" RETURNING "),
 		FromFragment:              []byte(" FROM"),
 		UsingFragment:             []byte(" USING "),
+		TagsFragment:              []byte(" TAGS "),
 		OnFragment:                []byte(" ON "),
 		WhereFragment:             []byte(" WHERE "),
 		GroupByFragment:           []byte(" GROUP BY "),
@@ -491,7 +497,7 @@ func DefaultDialectOptions() *SQLDialectOptions {
 		False:                     []byte("FALSE"),
 
 		PlaceHolderFragment: []byte("?"),
-		QuoteRune:           '"',
+		QuoteRune:           '\'',
 		StringQuote:         '\'',
 		SetOperatorRune:     '=',
 		CommaRune:           ',',
@@ -588,6 +594,8 @@ func DefaultDialectOptions() *SQLDialectOptions {
 			CommonTableSQLFragment,
 			InsertBeingSQLFragment,
 			IntoSQLFragment,
+			UsingSQLFragment,
+			TagsSQLFragment,
 			InsertSQLFragment,
 			ReturningSQLFragment,
 		},
