@@ -1,3 +1,94 @@
+# 兼容 taos TDengine 的 sql builder
+
+## 新增功能:
+  - 支持 Using 语法
+  - 支持 Tags 语法
+  
+  `sql := goqu.Insert(tableName).Using(superTableName).Tags(tags1, tags2).Cols(col1, col2).Vals(goqu.Vals{val1, val2}).ToSQL()`
+
+
+## 例子
+更多例子[insert_dataset_example_test.go](./insert_dataset_example_test.go)
+```go
+	type User struct {
+		FirstName string `db:"first_name"`
+		LastName  string `db:"last_name"`
+	}
+	ds := goqu.Insert("user").Rows(
+		User{FirstName: "Greg", LastName: "Farley"},
+		User{FirstName: "Jimmy", LastName: "Stewart"},
+		User{FirstName: "Jeff", LastName: "Jeffers"},
+	)
+	insertSQL, args, _ := ds.ToSQL()
+	fmt.Println(insertSQL, args)
+
+	// Output:
+	// INSERT INTO "user" ("first_name", "last_name") VALUES ('Greg', 'Farley'), ('Jimmy', 'Stewart'), ('Jeff', 'Jeffers') []
+
+
+	ds := goqu.Insert("user").Rows(
+		map[string]interface{}{"first_name": "Greg", "last_name": "Farley"},
+		map[string]interface{}{"first_name": "Jimmy", "last_name": "Stewart"},
+		map[string]interface{}{"first_name": "Jeff", "last_name": "Jeffers"},
+	)
+	insertSQL, args, _ := ds.ToSQL()
+	fmt.Println(insertSQL, args)
+
+	// Output:
+	// INSERT INTO "user" ("first_name", "last_name") VALUES ('Greg', 'Farley'), ('Jimmy', 'Stewart'), ('Jeff', 'Jeffers') []
+
+	insertSQL, _, _ := goqu.Insert("test").
+		Cols("a", "b", "c").
+		Vals(
+			[]interface{}{"a1", "b1", "c1"},
+			[]interface{}{"a2", "b1", "c1"},
+			[]interface{}{"a3", "b1", "c1"},
+		).
+		ToSQL()
+	fmt.Println(insertSQL)
+	// Output:
+	// INSERT INTO "test" ("a", "b", "c") VALUES ('a1', 'b1', 'c1'), ('a2', 'b1', 'c1'), ('a3', 'b1', 'c1')
+
+
+	ds := goqu.Insert("user").Prepared(true).Rows(
+		goqu.Record{"first_name": "Greg", "last_name": "Farley"},
+		goqu.Record{"first_name": "Jimmy", "last_name": "Stewart"},
+		goqu.Record{"first_name": "Jeff", "last_name": "Jeffers"},
+	)
+	insertSQL, args, _ := ds.ToSQL()
+	fmt.Println(insertSQL, args)
+	
+	type Address struct {
+		Street string `db:"address_street"`
+		State  string `db:"address_state"`
+	}
+	type User struct {
+		Address
+		FirstName string
+		LastName  string
+	}
+	ds := goqu.Insert("user").Rows(
+		User{Address: Address{Street: "111 Street", State: "NY"}, FirstName: "Greg", LastName: "Farley"},
+		User{Address: Address{Street: "211 Street", State: "NY"}, FirstName: "Jimmy", LastName: "Stewart"},
+		User{Address: Address{Street: "311 Street", State: "NY"}, FirstName: "Jeff", LastName: "Jeffers"},
+	)
+	insertSQL, args, _ := ds.ToSQL()
+	fmt.Println(insertSQL, args)
+
+	// Output:
+	// INSERT INTO "user" ("address_state", "address_street", "firstname", "lastname") VALUES ('NY', '111 Street', 'Greg', 'Farley'), ('NY', '211 Street', 'Jimmy', 'Stewart'), ('NY', '311 Street', 'Jeff', 'Jeffers') []
+
+	
+	
+	
+	
+  
+```
+
+
+---
+
+
 ```
   __ _  ___   __ _ _   _
  / _` |/ _ \ / _` | | | |

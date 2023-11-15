@@ -10,6 +10,19 @@ import (
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
 )
 
+func ExampleInsert_usingTag() {
+	ds := goqu.Insert("user").Using("super_table").Tags("123", "bbb", "ccc").Rows(
+		goqu.Record{"first_name": "Greg", "last_name": "Farley"},
+		goqu.Record{"first_name": "Jimmy", "last_name": "Stewart"},
+		goqu.Record{"first_name": "Jeff", "last_name": "Jeffers"},
+	)
+	insertSQL, args, _ := ds.ToSQL()
+	fmt.Println(insertSQL, args)
+
+	// Output:
+	// INSERT INTO 'user' USING 'super_table' TAGS  ('123', 'bbb', 'ccc') ('first_name', 'last_name') VALUES ('Greg', 'Farley'), ('Jimmy', 'Stewart'), ('Jeff', 'Jeffers') []
+}
+
 func ExampleInsert_goquRecord() {
 	ds := goqu.Insert("user").Rows(
 		goqu.Record{"first_name": "Greg", "last_name": "Farley"},
